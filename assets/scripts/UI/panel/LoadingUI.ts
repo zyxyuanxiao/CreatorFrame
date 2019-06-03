@@ -5,7 +5,7 @@ import GamePanel from "./GamePanel";
 import { UIManager } from "../../Manager/UIManager";
 import { NetWork } from "../../Http/NetWork";
 import ErrorPanel from "./ErrorPanel";
-import { GameData } from "../../Data/GameData";
+import DataReporting from "../../Data/DataReporting";
 
 const { ccclass, property } = cc._decorator;
 
@@ -34,19 +34,19 @@ export class LoadingUI extends BaseUI {
             let posX = completedCount / totalCount * 609 - 304;
             this.dragonNode.x = posX;
         };
-        if (ConstValue.IS_EDITIONS) {
-            // courseware.page.sendToParent('load start');
-            DataReporting.getInstance().dispatchEvent('load start');
-        }
+        // if (ConstValue.IS_EDITIONS) {
+        // courseware.page.sendToParent('load start');
+        DataReporting.getInstance().dispatchEvent('load start');
+        // }
         let openPanel: UIClass<BaseUI> = ConstValue.IS_TEACHER ? TeacherPanel : GamePanel;
         let openUI = () => {
             UIManager.getInstance().openUI(openPanel, 0, () => {
-                if (ConstValue.IS_EDITIONS) {
+            // if (ConstValue.IS_EDITIONS) {
                 // courseware.page.sendToParent('load end');
                 // courseware.page.sendToParent('start');
                 DataReporting.getInstance().dispatchEvent('load end');
                 DataReporting.getInstance().dispatchEvent('start');
-                }
+            // }
                 this.node.active = false;
             }, onProgress);
         }

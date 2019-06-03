@@ -31,7 +31,7 @@ export default class SubmissionPanel extends BaseUI {
             });
             return;
         }
-        let data = JSON.stringify({ CoursewareKey: ConstValue.CoursewareKey, is_result: 1, is_lavel: 0 });
+        let data = JSON.stringify({ CoursewareKey: ConstValue.CoursewareKey });
         NetWork.getInstance().httpRequest(NetWork.GET_TITLE + "?title_id=" + NetWork.title_id, "GET", "application/json;charset=utf-8", function (err, response) {
             if (!err) {
                 if (response.data.courseware_content == null || response.data.courseware_content == "") {
@@ -55,7 +55,7 @@ export default class SubmissionPanel extends BaseUI {
 
     //添加答案信息
     AddNet(gameDataJson) {
-        let data = { title_id: NetWork.title_id, courseware_content: gameDataJson };
+        let data = { title_id: NetWork.title_id, courseware_content: gameDataJson, is_result: 1, is_lavel: 0 };
         NetWork.getInstance().httpRequest(NetWork.ADD, "POST", "application/json;charset=utf-8", function (err, response) {
             if (!err) {
                 UIHelp.showTip("答案提交成功");
