@@ -1,14 +1,6 @@
 import { BaseUI } from "../BaseUI";
 import { NetWork } from "../../Http/NetWork";
-import { GameData } from "../../Data/GameData";
-import { ConstValue } from "../../Data/ConstValue";
-import { ListenerManager } from "../../Manager/ListenerManager";
-import { ListenerType } from "../../Data/ListenerType";
-import { UIHelp } from "../../Utils/UIHelp";
-import { UIManager } from "../../Manager/UIManager";
-import { TipUI } from "./TipUI";
-import { OverTips } from "../Item/OverTips";
-import SubmissionPanel from "./SubmissionPanel";
+import DataReporting from "../../Data/DataReporting";
 
 const { ccclass, property } = cc._decorator;
 
@@ -25,6 +17,20 @@ export default class GamePanel extends BaseUI {
     }
 
     start() {
+        DataReporting.getInstance().addEvent('end_game', this.onEndGame.bind(this));
+    }
+    
+    onEndGame() {
+        //如果已经上报过数据 则不再上报数据
+        if (DataReporting.isRepeatReport) {
+            DataReporting.getInstance().dispatchEvent('addLog', {
+                eventType: 'clickSubmit',
+                eventValue: JSON.stringify({})
+            });
+            DataReporting.isRepeatReport = false;
+        }
+        //eventValue  0为未答题   1为答对了    2为答错了或未完成
+        DataReporting.getInstance().dispatchEvent('end_finished', { eventType: 'activity', eventValue: 0 });
     }
 
     onDestroy() {
@@ -35,6 +41,10 @@ export default class GamePanel extends BaseUI {
     onShow() {
     }
 
+    setPanel() {
+
+    }
+
     getNet() {
         NetWork.getInstance().httpRequest(NetWork.GET_QUESTION + "?courseware_id=" + NetWork.courseware_id, "GET", "application/json;charset=utf-8", function (err, response) {
             if (!err) {
@@ -43,9 +53,11 @@ export default class GamePanel extends BaseUI {
                     return;
                 }
                 let content = JSON.parse(response_data.data.courseware_content);
-                if (content != null && content.CoursewareKey == ConstValue.CoursewareKey) {
+                if (content != null) {
                     this.setPanel();
                 }
+            } else {
+                this.setPanel();
             }
         }.bind(this), null);
     }

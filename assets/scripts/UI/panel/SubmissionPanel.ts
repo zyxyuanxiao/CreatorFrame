@@ -4,7 +4,6 @@ import { NetWork } from "../../Http/NetWork";
 import { UIHelp } from "../../Utils/UIHelp";
 import { ConstValue } from "../../Data/ConstValue";
 import ErrorPanel from "./ErrorPanel";
-import { GameData } from "../../Data/GameData";
 
 const { ccclass, property } = cc._decorator;
 
@@ -32,9 +31,7 @@ export default class SubmissionPanel extends BaseUI {
             });
             return;
         }
-        let data = JSON.stringify({ 
-            CoursewareKey: ConstValue.CoursewareKey
-        });
+        let data = JSON.stringify({ CoursewareKey: ConstValue.CoursewareKey, is_result: 1, is_lavel: 0 });
         NetWork.getInstance().httpRequest(NetWork.GET_TITLE + "?title_id=" + NetWork.title_id, "GET", "application/json;charset=utf-8", function (err, response) {
             if (!err) {
                 if (response.data.courseware_content == null || response.data.courseware_content == "") {
@@ -69,7 +66,7 @@ export default class SubmissionPanel extends BaseUI {
 
     //修改课件
     ModifyNet(gameDataJson) {
-        let jsonData = { courseware_id: NetWork.courseware_id, courseware_content: gameDataJson };
+        let jsonData = { courseware_id: NetWork.courseware_id, courseware_content: gameDataJson, is_result: 1, is_lavel: 0 };
         NetWork.getInstance().httpRequest(NetWork.MODIFY, "POST", "application/json;charset=utf-8", function (err, response) {
             if (!err) {
                 UIHelp.showTip("答案修改成功");

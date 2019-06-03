@@ -1,5 +1,6 @@
 import { BaseUI } from "../BaseUI";
 import { UIManager } from "../../Manager/UIManager";
+import { AudioManager } from "../../Manager/AudioManager";
 
 const { ccclass, property } = cc._decorator;
 
@@ -36,6 +37,7 @@ export default class ErrorPanel extends BaseUI {
      * @param isClose 是否可关闭
      */
     setPanel(shuoMing: string, biaoTi?: string, tiShi?: string, btnLab?: string, callBack?: Function, isClose: boolean = false) {
+        AudioManager.getInstance().playSound("sfx_erro", false, 1);
         this.shuoMing.string = shuoMing;
         this.isClose = isClose;
         this.callback = callBack;
@@ -46,6 +48,7 @@ export default class ErrorPanel extends BaseUI {
     }
 
     onBtnClick() {
+        AudioManager.getInstance().playSound("sfx_buttn", false, 1);
         if (this.callback) {
             this.callback();
         }

@@ -1,7 +1,7 @@
-
 import { BaseUI } from "../BaseUI";
 import { Tools } from "../../UIComm/Tools";
 import { UIManager } from "../../Manager/UIManager";
+import { AudioManager } from "../../Manager/AudioManager";
 
 const { ccclass, property } = cc._decorator;
 @ccclass
@@ -9,89 +9,76 @@ export class OverTips extends BaseUI {
 
     protected static className = "OverTips";
 
-    @property(cc.Node)
-    private NodeDes: cc.Node = null; //描述节点
     @property(cc.Label)
-    private des: cc.Label = null;
-    @property(cc.Button)
-    private close: cc.Button = null;
+    private label_tip: cc.Label = null;
+
     @property(sp.Skeleton)
-    private sp_BgAnimator: sp.Skeleton = null; // 背景动画
+    private spine_false: sp.Skeleton = null;
     @property(sp.Skeleton)
-    private sp_lightAnimator: sp.Skeleton = null; // 光动画
+    private spine_true: sp.Skeleton = null;
+    @property(sp.Skeleton)
+    private spine_complete: sp.Skeleton = null;
+
+    @property(cc.Node)
+    private node_close: cc.Node = null;
 
     private callback = null;
-    private type: number;
-    private isClose: boolean = true;
-    start() {
 
+    constructor() {
+        super();
+    }
+
+    start() {
+        this.node_close.on(cc.Node.EventType.TOUCH_END, this.onClickClose, this);
+    }
+
+    onDisable() {
+        this.node_close.off(cc.Node.EventType.TOUCH_END, this.onClickClose, this);
     }
 
     /**
-     * 
-     * @param type 成功 1 失败 2
-     * @param str 提示文字
-     * @param isClose 窗口是否可关闭
-     * @param callback 回调函数
+     设置显示内容
+     @param {number} type          0: 错误  1：答对了  2：闯关成功(一直显示不会关闭)
+     @param {string} str           提示内容
      */
-    init(type: number, str: string, isClose: boolean, callback: any = null) {
-        this.type = type;
+    init(type:number, str:string="",callback:Function):void {
         this.callback = callback;
-        this.isClose = isClose;
-        Tools.playSpine(this.sp_BgAnimator, "fault", false);
-
-        this.NodeDes.setScale(0.001, 0.001);
-        if (type == 1) {
-            this.Successful(str);
-        } else if (type == 2) {
-            this.failure(str);
+        this.spine_false.node.active = type == 0;
+        this.spine_true.node.active = type == 1;
+        this.spine_complete.node.active = type == 2;
+        this.label_tip.string = str;
+        this.label_tip.node.active = type != 2;
+        switch (type) {
+            case 0:
+                Tools.playSpine(this.spine_false, "false", false, this.delayClose.bind(this));
+                AudioManager.getInstance().playSound("sfx_genneg", false, 1);
+                break;
+            case 1:
+                Tools.playSpine(this.spine_true, "true", false, this.delayClose.bind(this));
+                AudioManager.getInstance().playSound("sfx_genpos", false, 1);
+                break;
+            case 2:
+                Tools.playSpine(this.spine_complete, "in", false, function () {
+                    Tools.playSpine(this.spine_complete, "stand", true, this.delayClose.bind(this));
+                }.bind(this));
+                AudioManager.getInstance().playSound("sfx_genpos", false, 1);
+                break;
         }
-        this.close.node.active = isClose;
-        this.TipsAnimatorScale(this.NodeDes);
-
+        let endPos = this.label_tip.node.position;
+        let framePos_1 = cc.v2(endPos.x, endPos.y - 72.8);
+        let framePos_2 = cc.v2(endPos.x, endPos.y + 12);
+        let framePos_3 = cc.v2(endPos.x, endPos.y - 8);
+        let framePos_4 = cc.v2(endPos.x, endPos.y + 7.3);
+        this.label_tip.node.position = framePos_1;
+        this.label_tip.node.runAction(cc.sequence(cc.moveTo(0.08, framePos_2), cc.moveTo(0.08, framePos_3), cc.moveTo(0.08, framePos_4), cc.moveTo(0.06, endPos)));
     }
 
-    //成功
-    Successful(str: string) {
-        this.des.node.active = true;
-        this.sp_lightAnimator.node.active = true;
-        // Tools.playSpine(this.sp_BgAnimator, "fault", false);
-        Tools.playSpine(this.sp_BgAnimator, this.isClose ? "right" : "right_1", false);
-        Tools.playSpine(this.sp_lightAnimator, "light", false);
-        this.des.string = str;
-        this.des.node.color = new cc.Color(39, 178, 187);
+    delayClose(): void {
+        this.scheduleOnce(function () { this.onClickClose() }.bind(this), 0);
     }
 
-    //失败
-    failure(str: string) {
-        this.des.node.active = true;
-        this.sp_lightAnimator.node.active = false;
-        Tools.playSpine(this.sp_BgAnimator, "fault", false);
-        this.des.string = str;
-        // this.des.node.color = new cc.Color(39, 178, 187);
-    }
-
-    OnClickClose() {
-        if (!this.isClose) {
-            //界面不关闭
-        } else {
-            UIManager.getInstance().closeUI(OverTips);
-            if(this.callback){
-                this.callback();
-            }
-        }
-        // this.node.active = false;
-    }
-
-    //通用动画
-    TipsAnimatorScale(nodeObj: cc.Node) {
-        nodeObj.stopAllActions();
-        var seq = cc.sequence(
-            cc.delayTime(1),
-            cc.scaleTo(0.2, 1, 1),
-        );
-        nodeObj.runAction(seq);
-        // nodeObj.runAction(cc.scaleTo(0.2, 1, 1));
-
+    onClickClose(event?, customEventData?): void {
+        if (event) AudioManager.getInstance().playSound("sfx_buttn", false, 1);
+        UIManager.getInstance().closeUI(OverTips);
     }
 }
