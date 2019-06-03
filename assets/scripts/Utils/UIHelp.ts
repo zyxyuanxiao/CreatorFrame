@@ -1,10 +1,9 @@
 import { UIManager } from "../Manager/UIManager";
 import { TipUI } from "../UI/panel/TipUI";
+import { AffirmTips } from "../UI/Item/affirmTips";
 import { OverTips } from "../UI/Item/OverTips";
-import { AffirmTips } from "../UI/Item/AffirmTips";
 
-export class UIHelp
-{
+export class UIHelp {
     /**
      * 
      * @param message tips文字内容
@@ -13,7 +12,7 @@ export class UIHelp
     public static showTip(message: string) {
         let tipUI = UIManager.getInstance().getUI(TipUI) as TipUI;
         if (!tipUI) {
-            UIManager.getInstance().openUI(TipUI, 205, () => {
+            UIManager.getInstance().openUI(TipUI, 200, () => {
                 UIHelp.showTip(message);
             });
         }
@@ -22,57 +21,40 @@ export class UIHelp
         }
     }
 
-    /**
-     * 显示OverTips
-     *
-     * @static
-     * @param {number} type 1成功 2失败
-     * @param {string} str 提示文字
-     * @param {boolean} isClose 窗口是否可关闭
-     * @param {*} callback 关闭时回调
-     * @memberof UIHelp
+     /**
+     * 结束tip
+     * @param message tips文字内容
+     * @param type tips类型  0:内容tips   1:系统tips
      */
-    public static showOverTips(type:number,str:string,isClose:boolean,callback:any, timeText: string)
-    {
+    public static showOverTip(type:number, str:string="",callback:Function =null) {
         let overTips = UIManager.getInstance().getUI(OverTips) as OverTips;
-        if(!overTips)
-        {
-            UIManager.getInstance().openUI(OverTips, 200, ()=>{
-                UIHelp.showOverTips(type,str,isClose,callback, timeText);
+        if (!overTips) {
+            UIManager.getInstance().openUI(OverTips, 210, () => {
+                UIHelp.showOverTip(type, str,callback);
             });
         }
-        else
-        {
-           overTips.init(type,str,isClose,callback);
+        else {
+            overTips.init(type, str,callback);
         }
     }
 
-    /**
-     * 关闭OverTips
-     *
-     * @static
-     * @memberof UIHelp
+     /**
+     * 二次确认框
+     * @param message tips文字内容
+     * @param type tips类型  0:内容tips   1:系统tips
      */
-    public static hideOverTips(){
-        let overTips = UIManager.getInstance().getUI(OverTips) as OverTips;
-        if(overTips){
-           UIManager.getInstance().closeUI(OverTips);
+    public static AffirmTip(type: number, des: string, callback: any, btnCloselDes?: string, btnOkDes?: string) {
+        let overTips = UIManager.getInstance().getUI(AffirmTips) as AffirmTips;
+        if (!overTips) {
+            UIManager.getInstance().openUI(AffirmTips, 210, () => {
+                UIHelp.AffirmTip(type, des,callback,btnCloselDes,btnOkDes);
+            });
+        }
+        else {
+            overTips.init(type, des,callback,btnCloselDes,btnOkDes);
         }
     }
 
-    public static affirmTips(type:number,des:string,callback:any)
-    {
-        let _afferTips = UIManager.getInstance().getUI(AffirmTips) as AffirmTips;
-        if(!_afferTips)
-        {
-            UIManager.getInstance().openUI(AffirmTips, 200, ()=>{
-                UIHelp.affirmTips(type,des,callback);
-            });
-        }
-        else
-        {
-            _afferTips.init(type,des,callback);
-        }
-    }
+
 }
 
