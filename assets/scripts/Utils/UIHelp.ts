@@ -25,8 +25,9 @@ export class UIHelp {
      * 结束tip
      * @param message tips文字内容
      * @param type tips类型  0:内容tips   1:系统tips
+     * @param {boolean} showClose    是否显示关闭按钮
      */
-    public static showOverTip(type:number, str:string="",callback:Function =null) {
+    public static showOverTip(type:number, str:string="",callback:Function =null, showClose: boolean = true) {
         let overTips = UIManager.getInstance().getUI(OverTips) as OverTips;
         if (!overTips) {
             UIManager.getInstance().openUI(OverTips, 210, () => {
@@ -34,7 +35,7 @@ export class UIHelp {
             });
         }
         else {
-            overTips.init(type, str,callback);
+            overTips.init(type, str,callback, showClose);
         }
     }
 
