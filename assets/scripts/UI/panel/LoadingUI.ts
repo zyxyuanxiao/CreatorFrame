@@ -26,57 +26,36 @@ export class LoadingUI extends BaseUI {
         let onProgress = (completedCount: number, totalCount: number, item: any) => {
             this.progressBar.progress = completedCount / totalCount;
             let value = Math.round(completedCount / totalCount * 100);
-            // if (ConstValue.IS_EDITIONS) {
-            //     courseware.page.sendToParent('loading', value);
-            // }
+
             DataReporting.getInstance().dispatchEvent('loading', value);
+
             this.progressLabel.string = value.toString() + '%';
             let posX = completedCount / totalCount * 609 - 304;
             this.dragonNode.x = posX;
         };
-        // if (ConstValue.IS_EDITIONS) {
-        // courseware.page.sendToParent('load start');
+
         DataReporting.getInstance().dispatchEvent('load start');
-        // }
+
         let openPanel: UIClass<BaseUI> = ConstValue.IS_TEACHER ? TeacherPanel : GamePanel;
         let openUI = () => {
             UIManager.getInstance().openUI(openPanel, 0, () => {
-            // if (ConstValue.IS_EDITIONS) {
-                // courseware.page.sendToParent('load end');
-                // courseware.page.sendToParent('start');
+
                 DataReporting.getInstance().dispatchEvent('load end');
                 DataReporting.getInstance().dispatchEvent('start');
-            // }
+
                 this.node.active = false;
             }, onProgress);
         }
-
-        this.loadGameData(openUI);
-    }
-
-    loadGameData(callback: any) {
-        cc.loader.loadRes("GameData", cc.JsonAsset, function (err, jsonAssert) {
-            if (!err) {
-                // cc.log(jsonAssert);
-               
-                if (!ConstValue.IS_TEACHER) {
-                    this.getRemoteDataByCoursewareID(callback);
-                } else {
-                    callback();
-                }
-
-            } else {
-                this.node.zIndex = -1;
-                UIManager.getInstance().openUI(ErrorPanel, 1000, () => {
-                    (UIManager.getInstance().getUI(ErrorPanel) as ErrorPanel).setPanel("游戏数据加载失败,请联系技术老师解决!", "", "", "确定");
-                });
-            }
-        }.bind(this))
+        if (ConstValue.IS_TEACHER) {
+            openUI();
+        }else{
+            this.getRemoteDataByCoursewareID(openUI);
+        }
     }
 
     getRemoteDataByCoursewareID(callback: Function) {
         NetWork.getInstance().httpRequest(NetWork.GET_QUESTION + "?courseware_id=" + NetWork.courseware_id, "GET", "application/json;charset=utf-8", function (err, response) {
-            // console.log("消息返回" + response);
+            console.log("消息返回" + response);
             if (!err) {
                 if (Array.isArray(response.data)) {
                     callback()

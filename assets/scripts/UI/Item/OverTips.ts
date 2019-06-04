@@ -15,6 +15,10 @@ export class OverTips extends BaseUI {
     @property(sp.Skeleton)
     private spine_false: sp.Skeleton = null;
     @property(sp.Skeleton)
+    private spine_false_noBtn: sp.Skeleton = null;
+    @property(sp.Skeleton)
+    private spine_true_noBtn: sp.Skeleton = null;
+    @property(sp.Skeleton)
     private spine_true: sp.Skeleton = null;
     @property(sp.Skeleton)
     private spine_complete: sp.Skeleton = null;
@@ -40,21 +44,34 @@ export class OverTips extends BaseUI {
      设置显示内容
      @param {number} type          0: 错误  1：答对了  2：闯关成功(一直显示不会关闭)
      @param {string} str           提示内容
+     @param {boolean} showClose    是否显示关闭按钮
      */
-    init(type:number, str:string="",callback:Function):void {
+    init(type: number, str: string = "", callback: Function, showClose: boolean = true): void {
         this.callback = callback;
+        if (showClose == true) {
+            this.spine_false.node.active = type == 0;
+            this.spine_true.node.active = type == 1;
+            this.spine_false_noBtn.node.active = false;
+            this.spine_true_noBtn.node.active = false;
+        } else {
+            this.spine_false_noBtn.node.active = type == 0;
+            this.spine_true_noBtn.node.active = type == 1;
+            this.spine_false.node.active = false;
+            this.spine_true.node.active = false;
+        }
         this.spine_false.node.active = type == 0;
         this.spine_true.node.active = type == 1;
+
         this.spine_complete.node.active = type == 2;
         this.label_tip.string = str;
         this.label_tip.node.active = type != 2;
         switch (type) {
             case 0:
-                Tools.playSpine(this.spine_false, "false", false, this.delayClose.bind(this));
+                Tools.playSpine(showClose ? this.spine_false : this.spine_false_noBtn, "false", false, this.delayClose.bind(this));
                 AudioManager.getInstance().playSound("sfx_genneg", false, 1);
                 break;
             case 1:
-                Tools.playSpine(this.spine_true, "true", false, this.delayClose.bind(this));
+                Tools.playSpine(showClose ? this.spine_true : this.spine_true_noBtn, "true", false, this.delayClose.bind(this));
                 AudioManager.getInstance().playSound("sfx_genpos", false, 1);
                 break;
             case 2:
