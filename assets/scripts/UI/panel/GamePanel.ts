@@ -1,16 +1,24 @@
 import { BaseUI } from "../BaseUI";
 import { NetWork } from "../../Http/NetWork";
 import DataReporting from "../../Data/DataReporting";
+import { ConstValue } from "../../Data/ConstValue";
+import { UIHelp } from "../../Utils/UIHelp";
+import { UIManager } from "../../Manager/UIManager";
+import { TipUI } from "./TipUI";
+import { OverTips } from "../Item/OverTips";
+import { ListenerType } from "../../Data/ListenerType";
+import { ListenerManager } from "../../Manager/ListenerManager";
+import SubmissionPanel from "./SubmissionPanel";
 
 export class ReporteSubject {
-    
+
 }
 export class ReporteAnswer {
-    studentAnswer = [];//学生作答信息
+    answer = [];//学生作答信息
 }
 export class ReporteLevelData {
     subject = null;
-    studentAnswer = null;
+    answer = null;
     result: number = null;// 1正确  2错误  3重复作答  4未作答  5已作答  
 }
 
@@ -31,15 +39,14 @@ export default class GamePanel extends BaseUI {
     start() {
         DataReporting.getInstance().addEvent('end_game', this.onEndGame.bind(this));
     }
-    
+
     onEndGame() {
         //如果已经上报过数据 则不再上报数据
-        if (DataReporting.isRepeatReport) {
+        if (!DataReporting.isRepeatReport) {
             DataReporting.getInstance().dispatchEvent('addLog', {
                 eventType: 'clickSubmit',
                 eventValue: this.reporteData()
             });
-            DataReporting.isRepeatReport = false;
         }
         //eventValue  0为未答题   1为答对了    2为答错了或未完成
         DataReporting.getInstance().dispatchEvent('end_finished', { eventType: 'activity', eventValue: 0 });
@@ -90,7 +97,27 @@ export default class GamePanel extends BaseUI {
         }
     }
 
+    getRemoteDataByCoursewareID(callback: Function) {
+        NetWork.getInstance().httpRequest(NetWork.GET_QUESTION + "?courseware_id=" + NetWork.courseware_id, "GET", "application/json;charset=utf-8", function (err, response) {
+            console.log("消息返回" + response);
+            if (!err) {
+                if (Array.isArray(response.data)) {
+                    callback()
+                    return;
+                }
+                let content = JSON.parse(response.data.courseware_content);
+                if (content != null && content.CoursewareKey == ConstValue.CoursewareKey) {
+                    // cc.log("拉取到数据：")
+                    // cc.log(content);
+                    callback();
+                }
+            }
+        }.bind(this), null);
+    }
+
     reporteData() {
+        DataReporting.isRepeatReport = true;
+        
         let isResult = 1;//是否有正确答案
         let isLavel = 1;//是否有关卡
         let levelData: Array<ReporteLevelData> = [];//关卡具体数据

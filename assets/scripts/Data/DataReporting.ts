@@ -5,7 +5,7 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class DataReporting{
 
-    public static isRepeatReport: boolean = true;//数据上报是否重复上报，如果已经上报过  则不能再上报
+    public static isRepeatReport: boolean = false;//数据上报是否重复上报，如果已经上报过  则不能再上报
     private static instance: DataReporting;
     static getInstance() {
         if (this.instance == null) {

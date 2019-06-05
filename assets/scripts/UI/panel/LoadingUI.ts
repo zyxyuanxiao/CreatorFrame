@@ -23,6 +23,7 @@ export class LoadingUI extends BaseUI {
 
     onLoad() {
         NetWork.getInstance().GetRequest();
+        
         let onProgress = (completedCount: number, totalCount: number, item: any) => {
             this.progressBar.progress = completedCount / totalCount;
             let value = Math.round(completedCount / totalCount * 100);
@@ -37,37 +38,12 @@ export class LoadingUI extends BaseUI {
         DataReporting.getInstance().dispatchEvent('load start');
 
         let openPanel: UIClass<BaseUI> = ConstValue.IS_TEACHER ? TeacherPanel : GamePanel;
-        let openUI = () => {
-            UIManager.getInstance().openUI(openPanel, 0, () => {
+        UIManager.getInstance().openUI(openPanel, 0, () => {
 
-                DataReporting.getInstance().dispatchEvent('load end');
-                DataReporting.getInstance().dispatchEvent('start');
+            DataReporting.getInstance().dispatchEvent('load end');
+            DataReporting.getInstance().dispatchEvent('start');
 
-                this.node.active = false;
-            }, onProgress);
-        }
-        if (ConstValue.IS_TEACHER) {
-            openUI();
-        }else{
-            this.getRemoteDataByCoursewareID(openUI);
-        }
-    }
-
-    getRemoteDataByCoursewareID(callback: Function) {
-        NetWork.getInstance().httpRequest(NetWork.GET_QUESTION + "?courseware_id=" + NetWork.courseware_id, "GET", "application/json;charset=utf-8", function (err, response) {
-            console.log("消息返回" + response);
-            if (!err) {
-                if (Array.isArray(response.data)) {
-                    callback()
-                    return;
-                }
-                let content = JSON.parse(response.data.courseware_content);
-                if (content != null && content.CoursewareKey == ConstValue.CoursewareKey) {
-                    // cc.log("拉取到数据：")
-                    // cc.log(content);
-                    callback();
-                }
-            }
-        }.bind(this), null);
+            this.node.active = false;
+        }, onProgress);
     }
 }
