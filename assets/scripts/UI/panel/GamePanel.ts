@@ -2,6 +2,18 @@ import { BaseUI } from "../BaseUI";
 import { NetWork } from "../../Http/NetWork";
 import DataReporting from "../../Data/DataReporting";
 
+export class ReporteSubject {
+    
+}
+export class ReporteAnswer {
+    studentAnswer = [];//学生作答信息
+}
+export class ReporteLevelData {
+    subject = null;
+    studentAnswer = null;
+    result: number = null;// 1正确  2错误  3重复作答  4未作答  5已作答  
+}
+
 const { ccclass, property } = cc._decorator;
 
 @ccclass
@@ -25,7 +37,7 @@ export default class GamePanel extends BaseUI {
         if (DataReporting.isRepeatReport) {
             DataReporting.getInstance().dispatchEvent('addLog', {
                 eventType: 'clickSubmit',
-                eventValue: JSON.stringify({})
+                eventValue: this.reporteData()
             });
             DataReporting.isRepeatReport = false;
         }
@@ -76,5 +88,15 @@ export default class GamePanel extends BaseUI {
         } else {
             UIHelp.showTip("请答对所有题目之后进行保存");
         }
+    }
+
+    reporteData() {
+        let isResult = 1;//是否有正确答案
+        let isLavel = 1;//是否有关卡
+        let levelData: Array<ReporteLevelData> = [];//关卡具体数据
+        let result: number = null; // 1正确  2错误  3重复作答  4未作答  5已作答  （若有答错则错  若未答完则报错）
+
+
+        return JSON.stringify({ "isResult": isResult, "isLavel": isLavel, "levelData": levelData, "result": result });
     }
 }

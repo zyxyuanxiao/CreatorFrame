@@ -62,16 +62,10 @@ export class LoadingUI extends BaseUI {
                     return;
                 }
                 let content = JSON.parse(response.data.courseware_content);
-                NetWork.courseware_id = response.data.courseware_id;
-                if (NetWork.empty) {
-                    //如果URL里面带了empty参数 并且为true  就立刻清除数据
-                    this.ClearNet();
-                } else {
-                    if (content != null && content.CoursewareKey == ConstValue.CoursewareKey) {
-                        // cc.log("拉取到数据：")
-                        // cc.log(content);
-                        callback();
-                    }
+                if (content != null && content.CoursewareKey == ConstValue.CoursewareKey) {
+                    // cc.log("拉取到数据：")
+                    // cc.log(content);
+                    callback();
                 }
             }
         }.bind(this), null);
