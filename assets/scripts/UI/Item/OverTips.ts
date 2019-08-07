@@ -2,7 +2,8 @@ import { BaseUI } from "../BaseUI";
 import { Tools } from "../../UIComm/Tools";
 import { UIManager } from "../../Manager/UIManager";
 import { AudioManager } from "../../Manager/AudioManager";
-
+import { ListenerManager } from "../../Manager/ListenerManager";
+import { ListenerType } from "../../Data/ListenerType";
 
 export enum Type_Tile {
     ZuoDaJieShu,
@@ -57,8 +58,9 @@ export class OverTips extends BaseUI {
     private btn_OK: cc.Button = null;
 
     private callback = null;
-    private endInAnimationOver: boolean = false;
+    private endInAnimation: boolean = false;
     private img_titles: cc.Node[] = [];
+    private bones: any[] = [];
 
     constructor() {
         super();
@@ -138,6 +140,11 @@ export class OverTips extends BaseUI {
                 this.spine_complete.node.active = false;
                 if (!endTitle) endTitle = DefalutTitle[0];
                 if (endTitle.length != 4) return;
+                this.bones = [];
+                this.bones.push(this.spine_complete.findBone("paipai"));
+                this.bones.push(this.spine_complete.findBone("xiaoU"));
+                this.bones.push(this.spine_complete.findBone("mimiya"));
+                this.bones.push(this.spine_complete.findBone("doudou"));
                 for (let index = 0; index < 4; index++) {
                     this.createTitleImage(endTitle[index]);
                 }
@@ -150,6 +157,16 @@ export class OverTips extends BaseUI {
         let framePos_4 = cc.v2(endPos.x, endPos.y + 7.3);
         this.label_tip.node.position = framePos_1;
         this.label_tip.node.runAction(cc.sequence(cc.moveTo(0.08, framePos_2), cc.moveTo(0.08, framePos_3), cc.moveTo(0.08, framePos_4), cc.moveTo(0.06, endPos)));
+    }
+
+    onBtnSureClick() {
+        this.onClickClose();
+        ListenerManager.getInstance().trigger(ListenerType.OverTipNext);
+    }
+
+    onBtnCancelClick() {
+        this.onClickClose();
+        ListenerManager.getInstance().trigger(ListenerType.OverTipRefresh);
     }
 
     delayClose(): void {
@@ -173,13 +190,14 @@ export class OverTips extends BaseUI {
             let image = imageNode.addComponent(cc.Sprite);
             image.spriteFrame = spriteFrame;
             imageNode.parent = this.node;
+            imageNode.active = false;
             this.img_titles.push(imageNode);
             if (this.img_titles.length == 4) {
-                this.endInAnimationOver = true;
+                this.endInAnimation = true;
                 this.spine_complete.node.active = true;
                 Tools.playSpine(this.spine_complete, "in", false, () => {
                     Tools.playSpine(this.spine_complete, "stand", true);
-                    this.endInAnimationOver = false;
+                    this.endInAnimation = false;
                 });
                 AudioManager.getInstance().playSound("sfx_geupgrd", false, 1);
             }
@@ -187,16 +205,10 @@ export class OverTips extends BaseUI {
     }
 
     update() {
-        if (!this.endInAnimationOver) return;
-
-        let bone = this.spine_complete.findBone("paipai");
-        let bone1 = this.spine_complete.findBone("xiaoU");
-        let bone2 = this.spine_complete.findBone("mimiya");
-        let bone3 = this.spine_complete.findBone("doudou");
-
-        this.img_titles[0].position = cc.v2(bone.worldX - 139, bone.worldY - 135);
-        this.img_titles[1].position = cc.v2(bone1.worldX - 139, bone1.worldY - 135);
-        this.img_titles[2].position = cc.v2(bone2.worldX - 139, bone2.worldY - 135);
-        this.img_titles[3].position = cc.v2(bone3.worldX - 139, bone3.worldY - 135);
+        if (!this.endInAnimation) return;
+        for (let index = 0; index < this.img_titles.length; index++) {
+            this.img_titles[index].active = true;
+            this.img_titles[index].position = cc.v2(this.bones[index].worldX - 139, this.bones[index].worldY - 135);
+        }
     }
 }

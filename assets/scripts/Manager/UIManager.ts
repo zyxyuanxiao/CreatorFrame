@@ -20,7 +20,7 @@ export class UIManager
         this.uiRoot = cc.find("Canvas");
     }
 
-    public openUI<T extends BaseUI>(uiClass: UIClass<T>, data?: any, zOrder?: number, callback?: Function, onProgress?: Function, ...args: any[])
+    public openUI<T extends BaseUI>(uiClass: UIClass<T>, zOrder?: number, callback?: Function, onProgress?: Function, ...args: any[])
     {
         if(this.getUI(uiClass))
         {
@@ -47,7 +47,6 @@ export class UIManager
             //zOrder && uiNode.setLocalZOrder(zOrder);
             if (zOrder) { uiNode.zIndex = zOrder; }
             let ui = uiNode.getComponent(uiClass) as BaseUI;
-            ui.data = data;
             ui.tag = uiClass;
             this.uiList.push(ui);
             if(callback)
@@ -70,11 +69,10 @@ export class UIManager
         }
     }
 
-    public showUI<T extends BaseUI>(uiClass: UIClass<T>, data?: any, callback?: Function)
+    public showUI<T extends BaseUI>(uiClass: UIClass<T>, callback?: Function)
     {
         let ui = this.getUI(uiClass);
         if(ui) {
-            ui.data = data;
             ui.node.active = true;
             ui.onShow();
             if(callback)
@@ -84,7 +82,7 @@ export class UIManager
         }
         else
         {
-            this.openUI(uiClass, data, 0, ()=>{
+            this.openUI(uiClass, 0, ()=>{
                 callback&&callback();
                 let ui = this.getUI(uiClass);
                 ui.onShow();
