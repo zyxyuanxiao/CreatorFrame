@@ -12,7 +12,7 @@ export class UIHelp {
     public static showTip(message: string) {
         let tipUI = UIManager.getInstance().getUI(TipUI) as TipUI;
         if (!tipUI) {
-            UIManager.getInstance().openUI(TipUI, 220, () => {
+            UIManager.getInstance().openUI(TipUI,  null, 220, () => {
                 UIHelp.showTip(message);
             });
         }
@@ -30,7 +30,7 @@ export class UIHelp {
     public static showOverTip(type:number, str:string="",callback:Function =null, showClose: boolean = true) {
         let overTips = UIManager.getInstance().getUI(OverTips) as OverTips;
         if (!overTips) {
-            UIManager.getInstance().openUI(OverTips, 200, () => {
+            UIManager.getInstance().openUI(OverTips,  null, 200, () => {
                 UIHelp.showOverTip(type, str,callback, showClose);
             });
         }
@@ -47,7 +47,7 @@ export class UIHelp {
     public static AffirmTip(type: number, des: string, callback: any, btnCloselDes?: string, btnOkDes?: string) {
         let overTips = UIManager.getInstance().getUI(AffirmTips) as AffirmTips;
         if (!overTips) {
-            UIManager.getInstance().openUI(AffirmTips, 200, () => {
+            UIManager.getInstance().openUI(AffirmTips,  null, 200, () => {
                 UIHelp.AffirmTip(type, des,callback,btnCloselDes,btnOkDes);
             });
         }

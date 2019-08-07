@@ -34,13 +34,10 @@
       },
       {
         "__id__": 19
-      },
-      {
-        "__id__": 20
       }
     ],
     "_prefab": {
-      "__id__": 21
+      "__id__": 20
     },
     "_opacity": 255,
     "_color": {
@@ -689,25 +686,6 @@
     "_isAbsVerticalCenter": true,
     "_originalWidth": 750,
     "_originalHeight": 1334,
-    "_id": ""
-  },
-  {
-    "__type__": "cf8a66RO2hJWJN7q1dt4/zn",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "progressBar": {
-      "__id__": 10
-    },
-    "progressLabel": {
-      "__id__": 13
-    },
-    "dragonNode": {
-      "__id__": 6
-    },
     "_id": ""
   },
   {

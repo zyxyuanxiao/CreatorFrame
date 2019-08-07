@@ -1,0 +1,19 @@
+{
+  "name": "auto_deploy",
+  "version": "0.0.1",
+  "description": "自动打包部署.",
+  "author": "kouyaqi",
+  "main": "main.js",
+  "main-menu": {
+    "i18n:MAIN_MENU.package.title/auto_deploy/open": {
+      "message": "auto_deploy:open"
+    }
+  },
+  "panel": {
+    "main": "panel/index.js",
+    "type": "dockable",
+    "title": "auto_deploy",
+    "width": 800,
+    "height": 600
+  }
+}

@@ -7,13 +7,12 @@
 
     <!--http://www.html5rocks.com/en/mobile/mobifying/-->
     <meta name="viewport"
-        content="width=device-width,user-scalable=no,initial-scale=1, minimum-scale=1,maximum-scale=1" />
+        content="width=device-width,user-scalable=0,initial-scale=1, minimum-scale=1,maximum-scale=1" />
 
     <!--https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html-->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="format-detection" content="telephone=no">
-
     <!-- force webkit on 360 -->
     <meta name="renderer" content="webkit" />
     <meta name="force-rendering" content="webkit" />
@@ -51,18 +50,19 @@
         }
     </style>
 
-	<style>
+    <style>
         @font-face {
             /* font-properties */
             font-family: huawawa;
-            src:url('./huawawa.ttf');
+            src: url('./huawawa.ttf');
         }
 
         .loading-texts {
             font-family: huawawa, sans-serif, system-ui;
         }
 
-        html, body {
+        html,
+        body {
             -ms-touch-action: none;
             background: #ffffff;
             padding: 0;
@@ -76,12 +76,13 @@
             pointer-events: none;
             justify-content: center;
             position: fixed;
-			background: linear-gradient(#44008F, #2E0856);
+            background: linear-gradient(#44008F, #2E0856);
             width: 100%;
             z-index: 99999999;
             top: 0;
             left: 0;
         }
+
         #loading-lottie {
             width: 100px;
             pointer-events: none;
@@ -90,6 +91,7 @@
             float: left;
             top: -56px;
         }
+
         #loading-container {
             width: 575px;
             pointer-events: none;
@@ -100,6 +102,7 @@
             bottom: 0;
             z-index: 999999;
         }
+
         /*
         #progress {
             height: 33px;
@@ -128,9 +131,10 @@
             width: 100%;
             object-fit: fill;
             z-index: 1000;
-			position: relative;
+            position: relative;
         }
-		.loading-text {
+
+        .loading-text {
             position: absolute;
             color: #fff;
             top: 50%;
@@ -139,11 +143,14 @@
             margin-left: -10rem;
             font-size: 3.5rem;
         }
+
         .loading {
             position: absolute;
-            left: 40%;
-            top: 45%;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
         }
+
         .loading p {
             float: left;
             color: #fff;
@@ -160,11 +167,12 @@
             line-height: 14px;
             margin-top: 16px;
         }
+
         .line-loading {
             float: left;
         }
 
-        .line-loading > div {
+        .line-loading>div {
             width: 10px;
             height: 10px;
             background-color: #fff;
@@ -189,22 +197,35 @@
             animation-delay: -1s;
             background: #FEBB00;
         }
+
         .line-loading .bounce3 {
             -webkit-animation-delay: -0.3s;
             animation-delay: -0.3s;
-            background:  #00A7FF;
+            background: #00A7FF;
         }
 
         @-webkit-keyframes bouncedelay {
-            0%, 80%, 100% { -webkit-transform: scale(0.0) }
-            40% { -webkit-transform: scale(1.0) }
+
+            0%,
+            80%,
+            100% {
+                -webkit-transform: scale(0.0)
+            }
+
+            40% {
+                -webkit-transform: scale(1.0)
+            }
         }
 
         @keyframes bouncedelay {
-            0%, 80%, 100% {
+
+            0%,
+            80%,
+            100% {
                 transform: scale(0.0);
                 -webkit-transform: scale(0.0);
             }
+
             40% {
                 transform: scale(1.0);
                 -webkit-transform: scale(1.0);
@@ -220,50 +241,136 @@
             <span style="width: 0%"></span>
         </div>
     </div>
-	<div id="loading-full">
-		<!--<img id="loading-bg" src="resource/assets/loading_bg.png" alt="">-->
-		<div id="loading-container">
-			<div id="progress">
-				<div id="progres"></div>
-			</div>
-			<div id="loading-lottie"></div>
-		</div>
-		<div class="loading">
-			<p class="loading-texts">课件加载中</p>
-			<div class="line-loading">
-				<div class="bounce1"></div>
-				<div class="bounce2"></div>
-				<div class="bounce3"></div>
-			</div>
-		</div>
+    <div id="loading-full">
+        <!--<img id="loading-bg" src="resource/assets/loading_bg.png" alt="">-->
+        <div id="loading-container">
+            <div id="progress">
+                <div id="progres"></div>
+            </div>
+            <div id="loading-lottie"></div>
+        </div>
+        <div class="loading">
+            <p class="loading-texts">课件加载中</p>
+            <div class="line-loading">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+        </div>
     </div>
     <script src="src/settings.js" charset="utf-8"></script>
     <script src="main.js" charset="utf-8"></script>
 
     <script>
-        var isOnlineEnv = /\/\/static\.haibian\.com/.test(window['location'].href)
-        var src = isOnlineEnv ? '//static.haibian.com/courseware/static/sdk/courseware-v1.0.0-alpha.js' : '//ceshi-static.haibian.com/courseware/static/sdk/courseware-v1.0.0-alpha.js'
+        var domainName = location.host.indexOf('localhost') < 0 ? location.host : 'ceshi-static.haibian.com';
+        var src = '//' + domainName + '/courseware/static/sdk/courseware-v1.0.0-alpha.js';
         document.write('<script src="' + src + '"><\/script>')
     </script>
 
     <script type="text/javascript">
-        (function () {
-			
-            var splash = document.getElementById('splash');
-            splash.style.display = 'block';
+            (function () {
+                //错误上报
+                var url = location.search; //获取url中"?"符后的字串
+                var theRequest = new Object();
+                if (url.indexOf("?") != -1) {
+                    var str = url.substr(1);
+                    var strs = str.split("&");
+                    for (var i = 0; i < strs.length; i++) {
+                        theRequest[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]);
+                    }
+                }
 
-            var cocos2d = document.createElement('script');
-            cocos2d.async = true;
-            cocos2d.src = window._CCSettings.debug ? 'cocos2d-js.js' : 'cocos2d-js-min.js';
+                window.addEventListener('error', event => {
+                    // console.log(event.error, '       addEventListener');
+                    errorLog(event.error.stack.split("\n"));
+                }, true)
 
-            var engineLoaded = function () {
-                document.body.removeChild(cocos2d);
-                cocos2d.removeEventListener('load', engineLoaded, false);
-                window.boot();
-            };
-            cocos2d.addEventListener('load', engineLoaded, false);
-            document.body.appendChild(cocos2d);
-        })();
+                var consoleError = window.console.error;
+                window.console.error = function () {
+                    // console.log(JSON.stringify(arguments), '      window.console.error')
+                    consoleError && consoleError.apply(window, arguments);
+                    errorLog(JSON.stringify(arguments));
+                }
+
+                var errorLog = function (data) {
+                    var img = new Image();
+                    img.src = (location.host.indexOf('ceshi-') < 0 && location.host.indexOf('localhost') < 0 ? 'https://logserver.haibian.com/statistical/?type=7&' : 'https://ceshi-statistical.haibian.com/?type=7&') +
+                        'course_id=' + theRequest["id"] +
+                        "&chapter_id=" + theRequest["chapter_id"] +
+                        "&user_id=" + theRequest["user_id"] +
+                        "&subject=" + theRequest["subject"] +
+                        "&event=" + "CoursewareErrorLogEvent" +
+                        "&identity=1" +
+                        "&extra=" + JSON.stringify({ ErrorLog: data, CoursewareName: "此处需修改为自己的项目名字  拼音", url: location })
+                }
+
+                //加载时间上报
+                var getNowFormatDate = function () {
+                    var date = new Date();
+                    var seperator1 = ":";
+                    var year = date.getFullYear();
+                    var month = date.getMonth() + 1;
+                    var strDate = date.getDate();
+                    if (month >= 1 && month <= 9) {
+                        month = "0" + month;
+                    }
+                    if (strDate >= 0 && strDate <= 9) {
+                        strDate = "0" + strDate;
+                    }
+
+                    var hours = date.getHours();       //获取当前小时数(0-23)
+                    var minutes = date.getMinutes();     //获取当前分钟数(0-59)
+                    var seconds = date.getSeconds();     //获取当前秒数(0-59)
+                    var milliSceonds = date.getMilliseconds();    //获取当前毫秒数(0-999)
+                    if (hours >= 0 && hours <= 9) {
+                        hours = "0" + hours;
+                    }
+                    if (minutes >= 0 && minutes <= 9) {
+                        minutes = "0" + minutes;
+                    }
+                    if (seconds >= 0 && seconds <= 9) {
+                        seconds = "0" + seconds;
+                    }
+                    if (milliSceonds >= 0 && milliSceonds <= 9) {
+                        milliSceonds = "00" + milliSceonds;
+                    }
+                    if (milliSceonds >= 10 && milliSceonds <= 90) {
+                        milliSceonds = "0" + milliSceonds;
+                    }
+
+                    var currentdate = year + seperator1 + month + seperator1 + strDate + seperator1 + hours + seperator1 + minutes + seperator1 + seconds + seperator1 + milliSceonds;
+                    return currentdate;
+                }
+
+                var reportCurTime = function (eventName, gameName) {
+                    var img = new Image();
+                    img.src = (location.host.indexOf('ceshi-') < 0 ? 'https://logserver.haibian.com/statistical/?type=7&' : 'https://ceshi-statistical.haibian.com/?type=7&') +
+                        'course_id=' + theRequest["id"] +
+                        "&chapter_id=" + theRequest["chapter_id"] +
+                        "&user_id=" + theRequest["user_id"] +
+                        "&subject=" + theRequest["subject"] +
+                        "&event=" + eventName +
+                        "&identity=1" +
+                        "&extra=" + JSON.stringify({ curTime: getNowFormatDate(), curGame: gameName })
+                }
+                reportCurTime("engineLoadStart", "此处需修改为自己的项目名字  拼音");
+                //引擎加载
+                var splash = document.getElementById('splash');
+                splash.style.display = 'block';
+
+                var cocos2d = document.createElement('script');
+                cocos2d.async = true;
+                cocos2d.src = window._CCSettings.debug ? 'cocos2d-js.js' : 'cocos2d-js-min.js';
+
+                var engineLoaded = function () {
+                    reportCurTime("engineLoadEnd", "此处需修改为自己的项目名字  拼音");
+                    document.body.removeChild(cocos2d);
+                    cocos2d.removeEventListener('load', engineLoaded, false);
+                    window.boot();
+                };
+                cocos2d.addEventListener('load', engineLoaded, false);
+                document.body.appendChild(cocos2d);
+            })();
     </script>
 </body>
 

@@ -55,12 +55,18 @@ export default class TeacherPanel extends BaseUI {
                     //如果URL里面带了empty参数 并且为true  就立刻清除数据
                     this.ClearNet();
                 } else {
-                    if (content != null && content.CoursewareKey == ConstValue.CoursewareKey) {
-                        // cc.log("拉取到数据：")
-                        // cc.log(content);
-                        
-                        this.setPanel();
-                    } 
+                     if (content != null) {
+                        if (content.CoursewareKey == ConstValue.CoursewareKey) {
+                            this.setPanel();
+                        } else {
+                            UIManager.getInstance().openUI(ErrorPanel, 1000, () => {
+                                (UIManager.getInstance().getUI(ErrorPanel) as ErrorPanel).setPanel(
+                                    "CoursewareKey错误,请联系客服！",
+                                    "", "", "确定");
+                            });
+                            return;
+                        }
+                    }
                 }
             }
         }.bind(this), null);

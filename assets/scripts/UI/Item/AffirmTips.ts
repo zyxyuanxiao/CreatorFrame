@@ -1,6 +1,8 @@
 
 import { BaseUI } from "../BaseUI";
 import { UIManager } from "../../Manager/UIManager";
+import { ListenerManager } from "../../Manager/ListenerManager";
+import { ListenerType } from "../../Data/ListenerType";
 
 const { ccclass, property } = cc._decorator;
 @ccclass
@@ -91,6 +93,7 @@ export class AffirmTips extends BaseUI {
         console.log("确认");
         UIManager.getInstance().closeUI(AffirmTips);
         this.callback(1);
+        ListenerManager.getInstance().trigger(ListenerType.ResetGame);
     }
 
     OnClickCancel() {

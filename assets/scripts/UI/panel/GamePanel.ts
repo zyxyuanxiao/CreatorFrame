@@ -9,6 +9,7 @@ import { OverTips } from "../Item/OverTips";
 import { ListenerType } from "../../Data/ListenerType";
 import { ListenerManager } from "../../Manager/ListenerManager";
 import SubmissionPanel from "./SubmissionPanel";
+import ErrorPanel from "./ErrorPanel";
 
 export class ReporteSubject {
 
@@ -60,27 +61,6 @@ export default class GamePanel extends BaseUI {
     onShow() {
     }
 
-    setPanel() {
-
-    }
-
-    getNet() {
-        NetWork.getInstance().httpRequest(NetWork.GET_QUESTION + "?courseware_id=" + NetWork.courseware_id, "GET", "application/json;charset=utf-8", function (err, response) {
-            if (!err) {
-                let response_data = response;
-                if (Array.isArray(response_data.data)) {
-                    return;
-                }
-                let content = JSON.parse(response_data.data.courseware_content);
-                if (content != null) {
-                    this.setPanel();
-                }
-            } else {
-                this.setPanel();
-            }
-        }.bind(this), null);
-    }
-
     //教师端  返回编辑器界面
     onBtnBottomBackClicked() {
         UIManager.getInstance().closeUI(TipUI);
@@ -98,6 +78,11 @@ export default class GamePanel extends BaseUI {
     }
 
     getRemoteDataByCoursewareID(callback: Function) {
+        if (ConstValue.IS_TEACHER) {
+            callback();
+            return;
+        }
+
         NetWork.getInstance().httpRequest(NetWork.GET_QUESTION + "?courseware_id=" + NetWork.courseware_id, "GET", "application/json;charset=utf-8", function (err, response) {
             console.log("消息返回" + response);
             if (!err) {
@@ -106,10 +91,19 @@ export default class GamePanel extends BaseUI {
                     return;
                 }
                 let content = JSON.parse(response.data.courseware_content);
-                if (content != null && content.CoursewareKey == ConstValue.CoursewareKey) {
-                    // cc.log("拉取到数据：")
-                    // cc.log(content);
-                    callback();
+                if (content != null) {
+                    if (content.CoursewareKey == ConstValue.CoursewareKey) {
+                        // cc.log("拉取到数据：")
+                        // cc.log(content);
+                        callback();
+                    } else {
+                        UIManager.getInstance().openUI(ErrorPanel, 1000, () => {
+                            (UIManager.getInstance().getUI(ErrorPanel) as ErrorPanel).setPanel(
+                                "CoursewareKey错误,请联系客服！",
+                                "", "", "确定");
+                        });
+                        return;
+                    }
                 }
             }
         }.bind(this), null);
@@ -117,12 +111,33 @@ export default class GamePanel extends BaseUI {
 
     reporteData() {
         DataReporting.isRepeatReport = true;
-        
+
         let isResult = 1;//是否有正确答案
         let isLavel = 1;//是否有关卡
         let levelData: Array<ReporteLevelData> = [];//关卡具体数据
         let result: number = null; // 1正确  2错误  3重复作答  4未作答  5已作答  （若有答错则错  若未答完则报错）
 
+        if (this.bFinished) {
+            result = 1;
+        } else if (this.isFirstStart == true) {
+            result = 4;
+        } else {
+            result = 2;
+        }
+
+        let subject = new ReporteSubject();
+
+        let answer = new ReporteAnswer();
+
+        let result_: number = null;
+
+
+        let levelData_ = new ReporteLevelData();
+        levelData_.subject = JSON.stringify(subject);
+        levelData_.answer = JSON.stringify(answer);
+        levelData_.result = result_;
+
+        levelData.push(levelData_);
 
         return JSON.stringify({ "isResult": isResult, "isLavel": isLavel, "levelData": levelData, "result": result });
     }

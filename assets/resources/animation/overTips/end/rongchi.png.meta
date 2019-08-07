@@ -1,15 +1,15 @@
 {
   "ver": "2.2.0",
-  "uuid": "6194b28e-72d8-47de-b6fb-b5340942f0e1",
+  "uuid": "e5fd172c-ab29-412c-9d56-3a485b8303c4",
   "type": "sprite",
   "wrapMode": "clamp",
   "filterMode": "bilinear",
   "premultiplyAlpha": false,
   "subMetas": {
     "rongchi": {
-      "ver": "1.0.3",
-      "uuid": "ccf3fcf6-b17c-48e7-81cf-1e514e5815e5",
-      "rawTextureUuid": "6194b28e-72d8-47de-b6fb-b5340942f0e1",
+      "ver": "1.0.4",
+      "uuid": "7296eada-a992-45c3-a311-36d764ed3c04",
+      "rawTextureUuid": "e5fd172c-ab29-412c-9d56-3a485b8303c4",
       "trimType": "auto",
       "trimThreshold": 1,
       "rotated": false,
