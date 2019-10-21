@@ -262,29 +262,30 @@
     <script src="main.js" charset="utf-8"></script>
 
     <script>
+        this.theRequest = new Object();
+        var url = location.search; //获取url中"?"符后的字串
 
-        var GetIsOnline = function () {
-            this.theRequest = new Object();
-            var url = location.search; //获取url中"?"符后的字串
-
-            if (url.indexOf("?") != -1) {
-                var str = url.substr(1);
-                var strs = str.split("&");
-                for (var i = 0; i < strs.length; i++) {
-                    this.theRequest[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]);
-                }
-            }
-            
-            var isOnline = 1;
-            if (this.theRequest["isOnline"]) {
-                isOnline = this.theRequest["isOnline"]
-            }
-            return isOnline;
-        }
-        var isOnline = GetIsOnline() == 1; //1是线上  0是测试
-        var isOwcr = location.protocol != 'owcr:' && location.protocol != 'file:';
+        var isOwcr = location.protocol != 'owcr:' && location.protocol != 'file:';//是否非预加载
         var protocol = isOwcr ? '//' : 'https://';
-        var domainName = isOwcr ? (location.host.indexOf('localhost') < 0 ? location.host : 'ceshi-static.haibian.com') : (isOnline ? 'courseware-vod.haibian.com' : 'ceshi-static.haibian.com');
+        if (url.indexOf("?") != -1) {
+            var str = url.substr(1);
+            var strs = str.split("&");
+            for (var i = 0; i < strs.length; i++) {
+                this.theRequest[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]);
+            }
+        }
+
+        var isOnline = 0;
+        if (this.theRequest["isOnline"]) {
+            isOnline = this.theRequest["isOnline"];
+        } else {
+            if (isOwcr) {//非预加载的情况
+                isOnline = (location.host.indexOf('localhost') < 0 && location.host.indexOf('ceshi') < 0) ? 1 : 0;
+            }
+        }
+        window['isOnline'] = isOnline;
+
+        var domainName = isOnline ? 'courseware-vod.haibian.com' : 'ceshi-static.haibian.com';
         var src = protocol + domainName + '/courseware/static/sdk/courseware-v1.0.0-alpha.js';
         document.write('<script src="' + src + '"><\/script>')
     </script>
@@ -304,7 +305,7 @@
 
                 window.addEventListener('error', function (event) {
                     console.log(event.error, '       addEventListener');
-                    errorLog(event.error.stack.split("\n"));
+                    upLog("CoursewareErrorLogEvent", true, JSON.stringify(event.error.stack.split("\n")));
                 }, true)
 
                 var consoleError = window.console.error;
@@ -314,23 +315,11 @@
                         Object.getOwnPropertyNames(arguments[0]).forEach(function (key) {
                             alt[key] = this[key];
                         }, arguments[0]);
-                        errorLog(JSON.stringify(alt));
+                        upLog("CoursewareErrorLogEvent", true, JSON.stringify(alt));
                     } else {
-                        errorLog(JSON.stringify(arguments[0]));
+                        upLog("CoursewareErrorLogEvent", true, JSON.stringify(arguments[0]));
                     }
                     consoleError && consoleError.apply(window, arguments);
-                }
-
-                var errorLog = function (data) {
-                    var img = new Image();
-                    img.src = (location.host.indexOf('ceshi-') < 0 && location.host.indexOf('localhost') < 0 ? 'https://logserver.haibian.com/statistical/?type=7&' : 'https://ceshi-statistical.haibian.com/?type=7&') +
-                        'course_id=' + theRequest["id"] +
-                        "&chapter_id=" + theRequest["chapter_id"] +
-                        "&user_id=" + theRequest["user_id"] +
-                        "&subject=" + theRequest["subject"] +
-                        "&event=" + "CoursewareErrorLogEvent" +
-                        "&identity=1" +
-                        "&extra=" + JSON.stringify({ ErrorLog: data, CoursewareName: "此处需修改为自己的项目名字  拼音", url: location })
                 }
 
                 //加载时间上报
@@ -371,18 +360,26 @@
                     return currentdate;
                 }
 
-                var reportCurTime = function (eventName, gameName) {
+                var upLog = function (eventName, isError=false, log="") {
                     var img = new Image();
-                    img.src = (location.host.indexOf('ceshi-') < 0 ? 'https://logserver.haibian.com/statistical/?type=7&' : 'https://ceshi-statistical.haibian.com/?type=7&') +
+                    var data = new Object();
+                    data.url = location;
+                    if (isError) {
+                        data.ErrorLog = log;
+                    }
+                    data.curTime = getNowFormatDate();
+                    data.CoursewareName = "此处需修改为自己的项目名字  拼音";
+
+                    img.src = (window['isOnline'] == 1 ? 'https://logserver.haibian.com/statistical/?type=7&' : 'https://ceshi-statistical.haibian.com/?type=7&') +
                         'course_id=' + theRequest["id"] +
                         "&chapter_id=" + theRequest["chapter_id"] +
                         "&user_id=" + theRequest["user_id"] +
                         "&subject=" + theRequest["subject"] +
                         "&event=" + eventName +
                         "&identity=1" +
-                        "&extra=" + JSON.stringify({ curTime: getNowFormatDate(), curGame: gameName })
+                        "&extra=" + JSON.stringify(data)
                 }
-                reportCurTime("engineLoadStart", "此处需修改为自己的项目名字  拼音");
+                upLog("engineLoadStart");
                 //引擎加载
                 var splash = document.getElementById('splash');
                 splash.style.display = 'block';
@@ -392,7 +389,7 @@
                 cocos2d.src = window._CCSettings.debug ? 'cocos2d-js.js' : 'cocos2d-js-min.js';
 
                 var engineLoaded = function () {
-                    reportCurTime("engineLoadEnd", "此处需修改为自己的项目名字  拼音");
+                    upLog("engineLoadEnd");
                     document.body.removeChild(cocos2d);
                     cocos2d.removeEventListener('load', engineLoaded, false);
                     window.boot();
