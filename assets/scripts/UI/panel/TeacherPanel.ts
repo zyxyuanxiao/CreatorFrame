@@ -19,7 +19,9 @@ export default class TeacherPanel extends BaseUI {
     btnCheck: cc.Button = null;
 
     onLoad () {
-        this.getNet();
+        this.getNet(function () {
+            
+        });
     }
 
     start() {
@@ -40,13 +42,15 @@ export default class TeacherPanel extends BaseUI {
                 ListenerManager.getInstance().trigger(ListenerType.OnEditStateSwitching, { state: 1 });
             }
         });
+
+
     }
 
-    getNet() {
+    getNet(callBack: Function) {
         NetWork.getInstance().httpRequest(NetWork.GET_TITLE + "?title_id=" + NetWork.title_id, "GET", "application/json;charset=utf-8", function (err, response) {
             if (!err) {
                 if (Array.isArray(response.data)) {
-                    this.setPanel();
+                    callBack();
                     return;
                 }
                 let content = JSON.parse(response.data.courseware_content);
@@ -55,9 +59,10 @@ export default class TeacherPanel extends BaseUI {
                     //如果URL里面带了empty参数 并且为true  就立刻清除数据
                     this.ClearNet();
                 } else {
-                     if (content != null) {
+                    if (content != null) {
                         if (content.CoursewareKey == ConstValue.CoursewareKey) {
-                            this.setPanel();
+                            //TODO: 数据接收
+                            callBack();
                         } else {
                             UIManager.getInstance().openUI(ErrorPanel, 1000, () => {
                                 (UIManager.getInstance().getUI(ErrorPanel) as ErrorPanel).setPanel(
